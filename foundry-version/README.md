@@ -66,3 +66,11 @@ $ cast --help
 ```
 
 Add your ALCHEMY_API_KEY to a `.env` file before running `forge test`.
+
+## First Try
+
+Tried to use WBTC/USDT pool but it did not have enough liquidity.
+
+## Second Try
+
+Use the WETH/USDT instead.
