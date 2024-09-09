@@ -1,9 +1,11 @@
 # Hands-on Exercise: Flash Loan based Liquidation
 
 ## Exercise
+
 In this exercise, you are expected to implement a smart contract that performs a flash loan based liquidation.
 
 ### Prerequisite
+
 - You need to register an account on https://www.alchemy.com/ for access to an archive Ethereum node.
 
 - You need to prepare the nodeJS environment for the project yourself, or have [docker](https://www.docker.com/) installed on your machine.
@@ -23,23 +25,26 @@ function operate() external;
 You are expected to liquidate `0x59CE4a2AC5bC3f5F225439B2993b86B42f6d3e9F` on Aave V2 which was liquidated at block `12489620`. Check out the [original liquidation transaction](https://etherscan.io/tx/0xac7df37a43fab1b130318bbb761861b8357650db2e2c6493b73d6da3d9581077).
 
 ### Commands
+
 To test your contract:
+
 1. `docker build -t defi-mooc-lab2 .`
 2. `docker run -e ALCHE_API="$YOUR ALCHEMY ETHEREUM MAINNET API" -it defi-mooc-lab2 npm test`
 
 ### Grading
 
-Your grade is determined by the actual profit you earn in the test case. After the program execution, you should see `Profit xxx ETH` at the end of a successful liquidation. If you are not using the docker environment, for successful execution you should also see a `profit.txt` file which contains the amount of ETH that you earned after the liquidation. **If your implementation is correct, you should be receiving at least 21 ETH as the profit.** Note that we reduce the gas fee to be zero to encourage programming complicated liquidation strategies. 
+Your grade is determined by the actual profit you earn in the test case. After the program execution, you should see `Profit xxx ETH` at the end of a successful liquidation. If you are not using the docker environment, for successful execution you should also see a `profit.txt` file which contains the amount of ETH that you earned after the liquidation. **If your implementation is correct, you should be receiving at least 21 ETH as the profit.** Note that we reduce the gas fee to be zero to encourage programming complicated liquidation strategies.
 
 ### Submission
 
-Your submission should be a single `LiquidationOperator.sol` file **that contains at most one import statement `import "hardhat/console.sol";`**. If you plan to include libraries or interfaces from other npm packages, please manually add them to your contract file so that we have a unified environment for grading. 
+Your submission should be a single `LiquidationOperator.sol` file **that contains at most one import statement `import "hardhat/console.sol";`**. If you plan to include libraries or interfaces from other npm packages, please manually add them to your contract file so that we have a unified environment for grading.
 
 ## Background
 
 We provide the following background information for this exercise.
 
 ### Aave liquidation
+
 To trigger a liquidation on Aave, you need to call a public function `liquidationCall` provided by the Aave smart contracts. In the function, you can specify `user` representing the borrowing position you would like to liquidate, `debtAsset`, the cryptocurrency you would like to repay (let's say token D), and `collateralAsset`, the collateral cryptocurrency you would like claim from the borrowing position (let's say token C). You also specify the amount of debt you want to repay, `debtToCover`.
 
 ```javascript
@@ -54,9 +59,10 @@ function liquidationCall(
 
 By calling this function, you then repay some amount of token D to Aave and in return, some token C is sent to your account.
 
-You should make sure that the user is in a liquidatable state. Otherwise, the aave smart contract would revert your transaction and you would pay transaction fees for an unsuccessful liquidation. 
+You should make sure that the user is in a liquidatable state. Otherwise, the aave smart contract would revert your transaction and you would pay transaction fees for an unsuccessful liquidation.
 
 ### Uniswap flash loan
+
 What if you don't have any upfront token D, but you do need some to repay in the liquidation? You can use flash loans! A Uniswap flash loan (a.k.a flash swap) can grant you the cryptocurrencies available in the pool without any collateral, as long as you preserve the constant `K` in the end of the transaction. Check out the detailed code snippet ([Uniswap V2](https://github.com/Uniswap/uniswap-v2-core/blob/master/contracts/UniswapV2Pair.sol)) in the following.
 
 ```javascript
@@ -94,13 +100,49 @@ function swap(uint amount0Out, uint amount1Out, address to, bytes calldata data)
 Importantly, Uniswap would attempt to call into the receiver to invoke the function `uniswapV2Call` after sending the flash loan assets. This means that you need a smart contract to accept a flash loan. The smart contract should have an `uniswapV2Call` function and you can program how you use the flash loan assets in this function.
 
 ```javascript
-if (data.length > 0) IUniswapV2Callee(to).uniswapV2Call(msg.sender, amount0Out, amount1Out, data);
+if (data.length > 0)
+  IUniswapV2Callee(to).uniswapV2Call(msg.sender, amount0Out, amount1Out, data);
 ```
 
 Back to liquidation, you can program the liquidation logic in the `uniswapV2Call` function. So, when you don't have enough token D to perform a liquidation, you can request a flash loan and your smart contract can do the liquidation after receiving token D.
 
 ### What do you need to do after liquidation?
+
 With the flash loan, you now have enough token D. You can repay the debt for the borrowing position and claim the collateral token C. Congratulation! A successful liquidation is completed, but, wait, you still need to repay the flash loan. Remember that you need to preserve the `K`. In the exercise, you are required to convert every earned token to ETH through e.g., exchanges. This is for easing the grading.
 
 ### More reference
+
 Please check out the links in the template file (`contracts/LiquidationOperator.sol`) for how to use the interfaces. [Etherscan](https://etherscan.io/) is a handy tool for exploring addresses, blocks, and transactions on-chain. If you have further questions or comments, please feel free to [submit an issue](https://github.com/KaihuaQin/defi-mooc-lab2/issues/new).
+
+## Writeup
+
+This was an interesting exercise to implement a flash loan based liquidation.
+
+### Methodology
+
+Initially, I tried to implement the flash loan using the WBTC/USDT pool but the liquidity was too low and I was not able to get enough WBTC from the liquidation to repay the debt.
+I then tried to use the WETH/USDT pool as the liquidity was much higher and I was able to get enough WETH from the liquidation to repay the debt.
+
+Using a similar number to the value borrowed in the transaction that occurred on-chain, I initially obtained a profit of about 24 ETH. It seemed like the liquidity of the pool
+affected greatly the amount of profit obtained. As such, I used a manual binary search to find a more optimal amount of borrow to liquidate the position because even if we
+do the max liquidation value, our slippage might be too high and just reduce our profits greatly.
+
+### Results
+
+| Profit | Borrow Amount |
+43762168324818561401 | 1816358033112 |
+43821203505881531242 | 1716358033112 |
+43592668520268314776 | 1616358033112 |
+42272938541636137282 | 1416358033112 |
+
+These were the initial values I used to perform the binary search. Since we get the most profit around 1716... to 1816... I did a more granular search in the area.1.
+
+This was the final value I used for the borrow amount: 1,741,358,033,112 and it nets us a profit of ~43.8 ETH. Full value: 43833405052996383613.
+
+### Improvements
+
+With more time, I would look into the following:
+
+1. Do a deeper dive into the historical data of the different liquidity pools. With some pools having much more liquidity than others, it might be possible to get a better profit by using a different pool. We will have to optimise
+   for the hops we take to get the best profit.
+2. Write an automated script to do an analysis of the best parameters for the flash loan. This would be a great way to improve the efficiency of the liquidation.
