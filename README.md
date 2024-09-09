@@ -136,7 +136,7 @@ do the max liquidation value, our slippage might be too high and just reduce our
 | 43592668520268314776 | 1616358033112 |
 | 42272938541636137282 | 1416358033112 |
 
-These were the initial values I used to perform the binary search. Since we get the most profit around 1716... to 1816... I did a more granular search in the area.1.
+These were the initial values I used to perform the binary search. Since we get the most profit around 1716... to 1816... I did a more granular search in the area.
 
 This was the final value I used for the borrow amount: 1,741,358,033,112 and it nets us a profit of ~43.8 ETH. Full value: 43833405052996383613.
 
