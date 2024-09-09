@@ -129,11 +129,12 @@ do the max liquidation value, our slippage might be too high and just reduce our
 
 ### Results
 
-| Profit | Borrow Amount |
-43762168324818561401 | 1816358033112 |
-43821203505881531242 | 1716358033112 |
-43592668520268314776 | 1616358033112 |
-42272938541636137282 | 1416358033112 |
+| Profit               | Borrow Amount |
+| -------------------- | ------------- |
+| 43762168324818561401 | 1816358033112 |
+| 43821203505881531242 | 1716358033112 |
+| 43592668520268314776 | 1616358033112 |
+| 42272938541636137282 | 1416358033112 |
 
 These were the initial values I used to perform the binary search. Since we get the most profit around 1716... to 1816... I did a more granular search in the area.1.
 
