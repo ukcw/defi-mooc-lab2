@@ -123,7 +123,7 @@ This was an interesting exercise to implement a flash loan based liquidation.
 Initially, I tried to implement the flash loan using the WBTC/USDT pool but the liquidity was too low and I was not able to get enough WBTC from the liquidation to repay the debt.
 I then tried to use the WETH/USDT pool as the liquidity was much higher and I was able to get enough WETH from the liquidation to repay the debt.
 
-Using a similar number to the value borrowed in the transaction that occurred on-chain, I initially obtained a profit of about 24 ETH. It seemed like the liquidity of the pool
+Using a similar number to the value borrowed in the transaction that occurred on-chain, I initially obtained a profit of about `24 ETH`. It seemed like the liquidity of the pool
 affected greatly the amount of profit obtained. As such, I used a manual binary search to find a more optimal amount of borrow to liquidate the position because even if we
 do the max liquidation value, our slippage might be too high and just reduce our profits greatly.
 
@@ -138,7 +138,7 @@ do the max liquidation value, our slippage might be too high and just reduce our
 
 These were the initial values I used to perform the binary search. Since we get the most profit around 1716... to 1816... I did a more granular search in the area.
 
-This was the final value I used for the borrow amount: 1,741,358,033,112 and it nets us a profit of ~43.8 ETH. Full value: 43833405052996383613.
+This was the final value I used for the borrow amount: `1,741,358,033,112 USDT` and it nets us a profit of `~43.8 ETH`. Full value: `43833405052996383613`.
 
 ### Improvements
 
