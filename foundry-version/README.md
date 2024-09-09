@@ -74,3 +74,9 @@ Tried to use WBTC/USDT pool but it did not have enough liquidity.
 ## Second Try
 
 Use the WETH/USDT instead.
+
+WETH reserve: 36309556407122758304221
+USDT reserve: 73490117144682
+
+WETH reserve: 107391732922008
+USDC reserve: 53146035951023773605158

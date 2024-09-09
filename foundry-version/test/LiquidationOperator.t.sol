@@ -2,6 +2,7 @@
 pragma solidity ^0.8.0;
 
 import "forge-std/Test.sol";
+import "forge-std/console.sol";
 import "../src/LiquidationOperator.sol";
 
 contract LiquidationTest is Test {
@@ -15,7 +16,6 @@ contract LiquidationTest is Test {
 
         // Set up liquidator
         liquidator = makeAddr("liquidator");
-        console.log("liquidator", liquidator);
         vm.deal(liquidator, 100 ether);
 
         // Deploy LiquidationOperator
@@ -78,8 +78,6 @@ contract LiquidationTest is Test {
         uint256 afterLiquidationBalance = liquidator.balance;
         int256 profit = int256(afterLiquidationBalance) -
             int256(beforeLiquidationBalance);
-
-        console.log("Profit", profit);
 
         assertTrue(profit > 0, "not profitable");
 
